@@ -1,7 +1,4 @@
-package primaryClasses;
-
-import InterfaceClasses.CurvedTextField;
-import InterfaceClasses.RoundedStud;
+//Package
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -16,9 +13,9 @@ public class TrueDisplayCompiler extends JFrame {
     List<String> fileCode = new ArrayList<>();
 
     // Instances of separated analysis classes
-    LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
-    SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer();
-    SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+    ReadLexical lexicalAnalyzer = new ReadLexical();
+    ReadSyntax syntaxAnalyzer = new ReadSyntax();
+    ReadSemantic semanticAnalyzer = new ReadSemantic();
 
     private int currentStep = 0; // 0 = Open File, 1 = Lexical Analysis, etc.
     private RoundedStud[] buttonPanels = new RoundedStud[5];
@@ -126,10 +123,8 @@ public class TrueDisplayCompiler extends JFrame {
                     }
                 } else if (index == 4) {
                     // Clear button clicked, but only show if there's an error
-                    if (hasError) {
-                        clearFields(outputAreaText, resultField);
-                        enableButtons(0); // Enable "Open File" button
-                    }
+                    clearFields(outputAreaText, resultField);
+                    enableButtons(0); // Enable "Open File" button
                 }
             });
 
@@ -223,14 +218,13 @@ public class TrueDisplayCompiler extends JFrame {
     }
 
     private void displaySemanticResult(String result, JTextField resultField) {
-        if ("Semantic Analysis Successful!".equals(result)) {
-            resultField.setText("Semantic Analysis Successful!");
+        if ("Semantically Correct!".equals(result)) {
+            resultField.setText("Semantically Correct!");
         } else if ("Semantically Incorrect!".equals(result)) {
             JOptionPane.showMessageDialog(null, "A Semantic Error has occurred!", "Semantic Error", JOptionPane.ERROR_MESSAGE);
             }
     }
-
-
+    
     private List<String> openFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select Source File");
