@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LexicalAnalyzer {
+public class ReadLexical {
     public List<String> analyze(List<String> input) {
         String[] dataTypes = {"int", "double", "char", "String", "boolean"};
         String[] booleans = {"true", "false"};
