@@ -1,16 +1,30 @@
 package com.miniCompiler;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-//import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DisplayCompiler extends JFrame {
+    String contents = "none";
+    List<String> tokens = new ArrayList<>();
+    List<String> fileCode = new ArrayList<>();
+
+    // Instances of separated analysis classes
+    LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
+    SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer();
+    SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
 
     public DisplayCompiler() {
         initComponents();
     }
 
     private void initComponents() {
+        JTextArea outputAreaText = new JTextArea();
+        CurvedTextField resultField = new CurvedTextField();
+
         setTitle("Mini Compiler");
         setSize(new Dimension(1280, 720)); // Set window size to 1280x720
         setLocationRelativeTo(null); // Center the window
@@ -19,25 +33,25 @@ public class DisplayCompiler extends JFrame {
 
         // Main panel with BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.decode("#031716")); 
+        mainPanel.setBackground(Color.decode("#031716"));
         setContentPane(mainPanel);
 
         // Header Panel
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(Color.decode("#031716")); 
+        headerPanel.setBackground(Color.decode("#031716"));
         headerPanel.setPreferredSize(new Dimension(1280, 60));
         headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         JLabel headerLabel = new JLabel("Mini Compiler");
         headerLabel.setFont(new Font("Arial", Font.BOLD, 20));
         headerLabel.setForeground(Color.WHITE);
         headerPanel.add(headerLabel);
-        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 25)); 
+        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 25));
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
         // Footer Panel
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(Color.decode("#031716"));
-        footerPanel.setPreferredSize(new Dimension(1280, 60)); 
+        footerPanel.setPreferredSize(new Dimension(1280, 60));
         footerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         JLabel footerLabel = new JLabel("© 2024 Mini Compiler | Bulatao, Daanoy, Mercado");
         footerLabel.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -46,10 +60,10 @@ public class DisplayCompiler extends JFrame {
         mainPanel.add(footerPanel, BorderLayout.SOUTH);
 
         // Left Sidebar Panel
-        JPanel sidebar = new JPanel(new GridLayout(5, 1, 20, 20)); 
-        sidebar.setBackground(Color.decode("#031716")); 
-        sidebar.setPreferredSize(new Dimension(250, 0)); 
-        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15)); 
+        JPanel sidebar = new JPanel(new GridLayout(5, 1, 20, 20));
+        sidebar.setBackground(Color.decode("#031716"));
+        sidebar.setPreferredSize(new Dimension(250, 0));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
         mainPanel.add(sidebar, BorderLayout.WEST);
 
         String[] buttons = {"Open File", "Lexical Analysis", "Syntax Analysis", "Semantic Analysis", "Clear"};
@@ -58,19 +72,22 @@ public class DisplayCompiler extends JFrame {
             RoundedStud buttonPanel = new RoundedStud(buttonText);
 
             buttonPanel.addActionListener(e -> {
-                // Handle button click here
-                System.out.println(buttonText + " clicked");
-                // add specific actions
+                // Handle button click
                 if ("Open File".equals(buttonText)) {
-                    // Handle Open File action
+                    fileCode = openFile();
+                    contents = convertListToString(fileCode);
+                    outputAreaText.setText(contents);
                 } else if ("Lexical Analysis".equals(buttonText)) {
-                    // Handle Lexical Analysis action
+                    tokens = lexicalAnalyzer.analyze(fileCode);
+                    displayTokens(tokens, resultField);
                 } else if ("Syntax Analysis".equals(buttonText)) {
-                    // Handle Syntax Analysis action
+                    boolean isValidSyntax = syntaxAnalyzer.analyze(tokens);
+                    displaySyntaxResult(isValidSyntax, resultField);
                 } else if ("Semantic Analysis".equals(buttonText)) {
-                    // Handle Semantic Analysis action
+                    String semanticResult = semanticAnalyzer.analyze(fileCode);
+                    displaySemanticResult(semanticResult, resultField);
                 } else if ("Clear".equals(buttonText)) {
-                    // Handle Clear action
+                    clearFields(outputAreaText, resultField);
                 }
             });
 
@@ -85,42 +102,104 @@ public class DisplayCompiler extends JFrame {
 
         // Output Area
         JTextArea outputArea = new JTextArea();
-        outputArea.setBackground(Color.decode("#C0C0C0")); 
-        outputArea.setForeground(Color.WHITE); 
+        outputArea.setBackground(Color.decode("#C0C0C0"));
+        outputArea.setForeground(Color.WHITE);
         outputArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
         outputArea.setEditable(false);
 
         // JScrollPane for Output Area
         JScrollPane outputScrollPane = new JScrollPane(outputArea);
-        outputScrollPane.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 20)); 
+        outputScrollPane.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 20));
         outputScrollPane.setBackground(Color.decode("#031716"));
         centerPanel.add(outputScrollPane, BorderLayout.CENTER);
 
-        outputScrollPane.setPreferredSize(new Dimension(0, 400));
+        outputScrollPane.setViewportView(outputAreaText);
 
-        // Result Panel (below the output area)
+        // Result Panel
         JPanel resultPanel = new JPanel();
         resultPanel.setBackground(Color.decode("#031716"));
-        resultPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 22, 20)); 
-        resultPanel.setPreferredSize(new Dimension(0, 100)); 
-        resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS)); 
+        resultPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 22, 20));
+        resultPanel.setPreferredSize(new Dimension(0, 100));
+        resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
         centerPanel.add(resultPanel, BorderLayout.SOUTH);
 
         // Result Label
         JLabel resultLabel = new JLabel("Result");
         resultLabel.setFont(new Font("Monospaced", Font.BOLD, 12));
         resultLabel.setForeground(Color.WHITE);
-        resultLabel.setAlignmentX(Component.LEFT_ALIGNMENT); 
+        resultLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         resultPanel.add(resultLabel);
 
         // Result Field
-        CurvedTextField resultField = new CurvedTextField();
-        resultField.setBackground(Color.decode("#C0C0C0")); 
+        resultField.setBackground(Color.decode("#C0C0C0"));
         resultField.setForeground(Color.BLACK);
-        resultField.setFont(new Font("Arial", Font.PLAIN, 14));
-        resultField.setEditable(false); 
-        resultField.setAlignmentX(Component.LEFT_ALIGNMENT); 
+        resultField.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        resultField.setEditable(false);
+        resultField.setAlignmentX(Component.LEFT_ALIGNMENT);
         resultPanel.add(resultField);
+    }
+
+    private void clearFields(JTextArea outputAreaText, JTextField resultField) {
+        contents = "none";
+        tokens = new ArrayList<>();
+        fileCode = new ArrayList<>();
+        outputAreaText.setText("");
+        resultField.setText("");
+    }
+
+    private void displayTokens(List<String> tokens, JTextField resultField) {
+        StringBuilder mergedTokens = new StringBuilder();
+        for (String token : tokens) {
+            mergedTokens.append(token).append("\n");
+        }
+        resultField.setText("Lexical Analysis Successful!");
+        JOptionPane.showMessageDialog(null, mergedTokens.toString(), "Lexical Tokens", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void displaySyntaxResult(boolean isValid, JTextField resultField) {
+        if (isValid) {
+            resultField.setText("Syntax Analysis Successful!");
+        } else {
+            resultField.setText("Syntax Error!");
+            JOptionPane.showMessageDialog(null, "A Syntax Error has occurred!", "Syntax Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void displaySemanticResult(String result, JTextField resultField) {
+        resultField.setText(result);
+        if ("Semantically Incorrect!".equals(result)) {
+            JOptionPane.showMessageDialog(null, "A Semantic Error has occurred!", "Semantic Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private List<String> openFile() {
+        JFileChooser chooseFile = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Java & Text Files", "java", "txt");
+        chooseFile.setFileFilter(filter);
+
+        int result = chooseFile.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooseFile.getSelectedFile();
+            return readFile(selectedFile);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<String> readFile(File file) {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lines;
+    }
+
+    private String convertListToString(List<String> list) {
+        return String.join("\n", list);
     }
 
     public static void main(String[] args) {
