@@ -17,6 +17,9 @@ public class DisplayCompiler extends JFrame {
     SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer();
     SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
 
+    private int currentStep = 0; // 0 = Open File, 1 = Lexical Analysis, etc.
+    private RoundedStud[] buttonPanels = new RoundedStud[5];
+
     public DisplayCompiler() {
         initComponents();
     }
@@ -68,29 +71,46 @@ public class DisplayCompiler extends JFrame {
 
         String[] buttons = {"Open File", "Lexical Analysis", "Syntax Analysis", "Semantic Analysis", "Clear"};
 
-        for (String buttonText : buttons) {
+        for (int i = 0; i < buttons.length; i++) {
+            String buttonText = buttons[i];
             RoundedStud buttonPanel = new RoundedStud(buttonText);
 
+            if (i != currentStep) {
+                buttonPanel.setEnabled(false); 
+            }
+
+            final int index = i; 
+
             buttonPanel.addActionListener(e -> {
-                // Handle button click
-                if ("Open File".equals(buttonText)) {
+                if (index == 0) {
+                    // Open File button clicked
                     fileCode = openFile();
                     contents = convertListToString(fileCode);
                     outputAreaText.setText(contents);
-                } else if ("Lexical Analysis".equals(buttonText)) {
+                } else if (index == 1) {
+                    // Lexical Analysis button clicked
                     tokens = lexicalAnalyzer.analyze(fileCode);
                     displayTokens(tokens, resultField);
-                } else if ("Syntax Analysis".equals(buttonText)) {
+                } else if (index == 2) {
+                    // Syntax Analysis button clicked
                     boolean isValidSyntax = syntaxAnalyzer.analyze(tokens);
                     displaySyntaxResult(isValidSyntax, resultField);
-                } else if ("Semantic Analysis".equals(buttonText)) {
+                } else if (index == 3) {
+                    // Semantic Analysis button clicked
                     String semanticResult = semanticAnalyzer.analyze(fileCode);
                     displaySemanticResult(semanticResult, resultField);
-                } else if ("Clear".equals(buttonText)) {
+                } else if (index == 4) {
+                    // Clear button clicked
                     clearFields(outputAreaText, resultField);
+                }
+
+                buttonPanels[index].setEnabled(false); 
+                if (index + 1 < buttons.length) {
+                    buttonPanels[index + 1].setEnabled(true); 
                 }
             });
 
+            buttonPanels[i] = buttonPanel; // Store button panel in the array
             sidebar.add(buttonPanel);
         }
 
