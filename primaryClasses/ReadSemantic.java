@@ -2,7 +2,7 @@ package com.miniCompiler;
 
 import java.util.List;
 
-public class SemanticAnalyzer {
+public class ReadSemantic {
     public String analyze(List<String> lines) {
         boolean valid = true;
 
