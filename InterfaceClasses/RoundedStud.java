@@ -16,19 +16,25 @@ public class RoundedStud extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                fireActionPerformed(); // Trigger action listeners
+                if (isEnabled()) {
+                    fireActionPerformed(); // Trigger action listeners
+                }
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                hovered = true; // Change hover state
-                repaint(); // Repaint on hover
+                if (isEnabled()) {
+                    hovered = true; // Change hover state
+                    repaint(); // Repaint on hover
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                hovered = false; // Reset hover state
-                repaint(); // Repaint on exit
+                if (isEnabled()) {
+                    hovered = false; // Reset hover state
+                    repaint(); // Repaint on exit
+                }
             }
         });
     }
@@ -46,10 +52,14 @@ public class RoundedStud extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Draw the rounded background
-        if (hovered) {
-            g2d.setColor(Color.decode("#0A7075")); // Hover color
+        if (isEnabled()) {
+            if (hovered) {
+                g2d.setColor(Color.decode("#0A7075")); // Hover color
+            } else {
+                g2d.setColor(Color.decode("#032F30")); // Default color
+            }
         } else {
-            g2d.setColor(Color.decode("#032F30")); // Default color
+            g2d.setColor(Color.GRAY); // Disabled color
         }
         g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
 
@@ -63,6 +73,13 @@ public class RoundedStud extends JPanel {
         g2d.drawString(buttonText, x, y);
 
         g2d.dispose(); // Dispose graphics context
+    }
+
+    // disable
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        setCursor(enabled ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor());
     }
 
     public void addActionListener(ActionListener listener) {
