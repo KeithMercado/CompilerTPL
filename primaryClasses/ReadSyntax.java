@@ -2,7 +2,7 @@ package com.miniCompiler;
 
 import java.util.List;
 
-public class SyntaxAnalyzer {
+public class ReadSyntax {
     public boolean analyze(List<String> parse) {
         String valid = "<data_type> <identifier> <assignment_operator> <value> <delimiter>";
 
