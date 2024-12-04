@@ -2,8 +2,9 @@ package com.miniCompiler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 
 public class ReadLexical {
     public List<String> analyze(List<String> input) {
@@ -20,26 +21,51 @@ public class ReadLexical {
 
         for (String statement : input) {
             Matcher matcher = pattern.matcher(statement);
-            StringBuilder token = new StringBuilder("");
+            StringBuilder token = new StringBuilder();
+            boolean hasDataType = false;
+            boolean hasIdentifier = false;
+            boolean hasAssignmentOperator = false;
+            boolean hasValue = false;
+            boolean hasDelimiter = false;
+
             while (matcher.find()) {
                 String lexeme = matcher.group();
                 if (isInArray(lexeme, dataTypes)) {
                     token.append("<data_type> ");
+                    hasDataType = true;
                 } else if (isInArray(lexeme, operator)) {
                     token.append("<assignment_operator> ");
+                    hasAssignmentOperator = true;
                 } else if (isInArray(lexeme, booleans)) {
                     token.append("<value> ");
+                    hasValue = true;
                 } else if (lexeme.matches(identifier)) {
                     token.append("<identifier> ");
+                    hasIdentifier = true;
                 } else if (stringPattern.matcher(lexeme).matches()) {
                     token.append("<value> ");
+                    hasValue = true;
                 } else if (lexeme.matches(value)) {
                     token.append("<value> ");
+                    hasValue = true;
                 } else if (isInArray(lexeme, delimiter)) {
                     token.append("<delimiter> ");
+                    hasDelimiter = true;
                 }
             }
-            output.add(token.toString().trim());
+
+            List<String> missingTokens = new ArrayList<>();
+            if (!hasDataType) missingTokens.add("<data_type>");
+            if (!hasIdentifier) missingTokens.add("<identifier>");
+            if (!hasAssignmentOperator) missingTokens.add("<assignment_operator>");
+            if (!hasValue) missingTokens.add("<value>");
+            if (!hasDelimiter) missingTokens.add("<delimiter>");
+
+            if (!missingTokens.isEmpty()) {
+                output.add("Error: Missing tokens: " + String.join(", ", missingTokens));
+            } else {
+                output.add(token.toString().trim());
+            }
         }
 
         return output;
