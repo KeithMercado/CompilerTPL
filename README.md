@@ -1,6 +1,6 @@
-# 🖥️ Mini Compiler  
+# Mini Compiler  
 
-## 📖 Description  
+## Description  
 The **Mini Compiler** is a Java-based application with a **Graphical User Interface (GUI)** designed to perform the initial stages of code compilation:  
 - **Lexical Analysis**  
 - **Syntax Analysis**  
@@ -10,7 +10,7 @@ It accepts `.java` and `.txt` files as input, analyzing their content for errors
 
 ---
 
-## ✨ Features  
+## Features  
 ### 1. **Lexical Analysis**  
 - Breaks the input into meaningful elements like keywords, identifiers, and symbols.  
 - Detects invalid tokens or unrecognized characters.  
@@ -24,16 +24,16 @@ It accepts `.java` and `.txt` files as input, analyzing their content for errors
 
 ---
 
-## 🏗️ Project Structure  
+## Project Structure  
 
-### **Interface Classes (GUI Design)**  
+### Interface Classes (GUI Design)  
 - **`CurveTextField.java`**  
   - Custom-styled text field component for enhanced input design.  
 
 - **`RoundedStud.java`**  
   - Custom button component with a rounded design for a user-friendly interface.  
 
-### **Core Algorithm and Functionality Classes**  
+### Core Algorithm and Functionality Classes  
 - **`DisplayCompiler.java`**  
   - Main class that integrates the GUI with the compiler logic.  
   - Provides an interface to load files and run analyses.  
@@ -49,7 +49,7 @@ It accepts `.java` and `.txt` files as input, analyzing their content for errors
 
 ---
 
-## 💻 Development Environment  
+## Development Environment  
 - **IDEs**:  
   - IntelliJ IDEA  
   - Visual Studio Code (VS Code)  
@@ -59,13 +59,13 @@ It accepts `.java` and `.txt` files as input, analyzing their content for errors
 
 ---
 
-## 🚀 How to Use  
+## How to Use  
 
--leave blank muna natin until we finish our project
+leave blank muna natin until we finish our project
 
 ---
 
-## 👥 Authors  
-- **Bulatao, Luis Joshua D.**  
-- **Daanoy, Venus Ruselle B.**  
-- **Mercado, John Keith S.**  
+## Authors  
+- *Bulatao, Luis Joshua D.*  
+- *Daanoy, Venus Ruselle B.*  
+- *Mercado, John Keith S.*  
