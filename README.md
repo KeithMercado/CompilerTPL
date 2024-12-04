@@ -60,6 +60,6 @@ The **Mini Compiler** is a Java-based application with a **Graphical User Interf
 
 
 ## Authors
-Bulatao, Luis Joshua D.
-Daanoy, Venus Ruselle B.
-Mercado, John Keith S.
+- Bulatao, Luis Joshua D.
+- Daanoy, Venus Ruselle B.
+- Mercado, John Keith S.
