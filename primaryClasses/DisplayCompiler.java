@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -237,6 +236,7 @@ public class DisplayCompiler extends JFrame {
             resultField.setText("Semantically Correct!");
         } else if ("Semantically Incorrect!".equals(result)) {
             JOptionPane.showMessageDialog(null, "A Semantic Error has occurred!", "Semantic Error", JOptionPane.ERROR_MESSAGE);
+            resultField.setText("Semantically Incorrect!");
         }
     }
 
