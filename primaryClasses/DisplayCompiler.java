@@ -1,4 +1,3 @@
-package com.miniCompiler;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -13,12 +12,14 @@ public class DisplayCompiler extends JFrame {
     List<String> fileCode = new ArrayList<>();
 
     // Instances of separated analysis classes
-    LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
-    SyntaxAnalyzer syntaxAnalyzer = new SyntaxAnalyzer();
-    SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+    ReadLexical lexicalAnalyzer = new ReadLexical();
+    ReadSyntax syntaxAnalyzer = new ReadSyntax();
+    ReadSemantic semanticAnalyzer = new ReadSemantic();
 
     private int currentStep = 0; // 0 = Open File, 1 = Lexical Analysis, etc.
     private RoundedStud[] buttonPanels = new RoundedStud[5];
+
+    private boolean hasError = false; // Flag to track error state
 
     public DisplayCompiler() {
         initComponents();
@@ -26,6 +27,7 @@ public class DisplayCompiler extends JFrame {
 
     private void initComponents() {
         JTextArea outputAreaText = new JTextArea();
+        outputAreaText.setEditable(false);
         CurvedTextField resultField = new CurvedTextField();
 
         setTitle("Mini Compiler");
@@ -76,10 +78,10 @@ public class DisplayCompiler extends JFrame {
             RoundedStud buttonPanel = new RoundedStud(buttonText);
 
             if (i != currentStep) {
-                buttonPanel.setEnabled(false); 
+                buttonPanel.setEnabled(false);
             }
 
-            final int index = i; 
+            final int index = i;
 
             buttonPanel.addActionListener(e -> {
                 if (index == 0) {
@@ -87,26 +89,46 @@ public class DisplayCompiler extends JFrame {
                     fileCode = openFile();
                     contents = convertListToString(fileCode);
                     outputAreaText.setText(contents);
+                    hasError = false; // Reset error state
+                        if (outputAreaText.getText().isEmpty()) {
+                            buttonPanels[0].setEnabled(true);
+                        }
+                        else {
+                            enableButtons(1); // Enable next button (Lexical Analysis)
+                        }
                 } else if (index == 1) {
                     // Lexical Analysis button clicked
                     tokens = lexicalAnalyzer.analyze(fileCode);
                     displayTokens(tokens, resultField);
+                    if (hasError) {
+                        disableAllButtonsExceptClear();
+                    } else {
+                        enableButtons(2); // Enable next button (Syntax Analysis)
+                    }
                 } else if (index == 2) {
                     // Syntax Analysis button clicked
                     boolean isValidSyntax = syntaxAnalyzer.analyze(tokens);
                     displaySyntaxResult(isValidSyntax, resultField);
+                    hasError = !isValidSyntax; // If syntax is invalid, set error flag
+                    if (hasError) {
+                        disableAllButtonsExceptClear();
+                    } else {
+                        enableButtons(3); // Enable next button (Semantic Analysis)
+                    }
                 } else if (index == 3) {
                     // Semantic Analysis button clicked
                     String semanticResult = semanticAnalyzer.analyze(fileCode);
                     displaySemanticResult(semanticResult, resultField);
+                    hasError = "Semantically Incorrect!".equals(semanticResult); // Check if semantic result is incorrect
+                    if (hasError) {
+                        disableAllButtonsExceptClear();
+                    } else {
+                        enableButtons(4); // All steps are completed
+                    }
                 } else if (index == 4) {
-                    // Clear button clicked
+                    // Clear button clicked, but only show if there's an error
                     clearFields(outputAreaText, resultField);
-                }
-
-                buttonPanels[index].setEnabled(false); 
-                if (index + 1 < buttons.length) {
-                    buttonPanels[index + 1].setEnabled(true); 
+                    enableButtons(0); // Enable "Open File" button
                 }
             });
 
@@ -160,22 +182,47 @@ public class DisplayCompiler extends JFrame {
     }
 
     private void clearFields(JTextArea outputAreaText, JTextField resultField) {
-        contents = "none";
+        contents = "";
         tokens = new ArrayList<>();
         fileCode = new ArrayList<>();
         outputAreaText.setText("");
         resultField.setText("");
+        hasError = false; // Reset error state
+    }
+
+    private void disableAllButtonsExceptClear() {
+        for (int i = 0; i < buttonPanels.length - 1; i++) {
+            buttonPanels[i].setEnabled(false);
+        }
+        buttonPanels[4].setEnabled(true); // Enable only Clear button
+    }
+
+    private void enableButtons(int step) {
+        for (int i = 0; i < buttonPanels.length; i++) {
+            buttonPanels[i].setEnabled(i == step);
+        }
     }
 
     private void displayTokens(List<String> tokens, JTextField resultField) {
         StringBuilder mergedTokens = new StringBuilder();
-        for (String token : tokens) {
-            mergedTokens.append(token).append("\n");
-        }
-        resultField.setText("Lexical Analysis Successful!");
-        JOptionPane.showMessageDialog(null, mergedTokens.toString(), "Lexical Tokens", JOptionPane.INFORMATION_MESSAGE);
-    }
+        boolean withError = false;
 
+        for (String token : tokens) {
+            if (token.startsWith("Error")) {
+                withError = true;
+                    resultField.setText("Lexical Error!");
+                JOptionPane.showMessageDialog(null, token, "Lexical Error", JOptionPane.ERROR_MESSAGE);
+                hasError = true;
+            } else {
+                mergedTokens.append(token).append("\n");
+            }
+        }
+
+        if (!withError) {
+            resultField.setText("Lexical Analysis Successful!");
+            JOptionPane.showMessageDialog(null, mergedTokens.toString(), "Lexical Tokens", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
     private void displaySyntaxResult(boolean isValid, JTextField resultField) {
         if (isValid) {
             resultField.setText("Syntax Analysis Successful!");
@@ -186,36 +233,32 @@ public class DisplayCompiler extends JFrame {
     }
 
     private void displaySemanticResult(String result, JTextField resultField) {
-        resultField.setText(result);
-        if ("Semantically Incorrect!".equals(result)) {
+        if ("Semantic Analysis Successful!".equals(result)) {
+            resultField.setText("Semantically Correct!");
+        } else if ("Semantically Incorrect!".equals(result)) {
             JOptionPane.showMessageDialog(null, "A Semantic Error has occurred!", "Semantic Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private List<String> openFile() {
-        JFileChooser chooseFile = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Java & Text Files", "java", "txt");
-        chooseFile.setFileFilter(filter);
-
-        int result = chooseFile.showOpenDialog(null);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select Source File");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Java & Text Files", "java", "txt"));
+        int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = chooseFile.getSelectedFile();
-            return readFile(selectedFile);
+            File file = fileChooser.getSelectedFile();
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                List<String> lines = new ArrayList<>();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lines.add(line);
+                }
+                return lines;
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
         return new ArrayList<>();
-    }
-
-    private List<String> readFile(File file) {
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return lines;
     }
 
     private String convertListToString(List<String> list) {
