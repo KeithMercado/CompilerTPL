@@ -218,13 +218,13 @@ public class TrueDisplayCompiler extends JFrame {
     }
 
     private void displaySemanticResult(String result, JTextField resultField) {
-        if ("Semantically Correct!".equals(result)) {
+        if ("Semantic Analysis Successful!".equals(result)) {
             resultField.setText("Semantically Correct!");
         } else if ("Semantically Incorrect!".equals(result)) {
             JOptionPane.showMessageDialog(null, "A Semantic Error has occurred!", "Semantic Error", JOptionPane.ERROR_MESSAGE);
             }
     }
-    
+
     private List<String> openFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select Source File");
@@ -256,5 +256,4 @@ public class TrueDisplayCompiler extends JFrame {
             app.setVisible(true);
         });
     }
-
 }
