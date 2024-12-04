@@ -28,6 +28,7 @@ public class TrueDisplayCompiler extends JFrame {
 
     private void initComponents() {
         JTextArea outputAreaText = new JTextArea();
+        outputAreaText.setEditable(false);
         CurvedTextField resultField = new CurvedTextField();
 
         setTitle("Mini Compiler");
@@ -201,13 +202,23 @@ public class TrueDisplayCompiler extends JFrame {
 
     private void displayTokens(List<String> tokens, JTextField resultField) {
         StringBuilder mergedTokens = new StringBuilder();
-        for (String token : tokens) {
-            mergedTokens.append(token).append("\n");
-        }
-        resultField.setText("Lexical Analysis Successful!");
-        JOptionPane.showMessageDialog(null, mergedTokens.toString(), "Lexical Tokens", JOptionPane.INFORMATION_MESSAGE);
-    }
+        boolean hasError = false;
 
+        for (String token : tokens) {
+            if (token.startsWith("Error")) {
+                hasError = true;
+                resultField.setText("Lexical Analysis Failed!");
+                JOptionPane.showMessageDialog(null, token, "Lexical Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                mergedTokens.append(token).append("\n");
+            }
+        }
+
+        if (!hasError) {
+            resultField.setText("Lexical Analysis Successful!");
+            JOptionPane.showMessageDialog(null, mergedTokens.toString(), "Lexical Tokens", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
     private void displaySyntaxResult(boolean isValid, JTextField resultField) {
         if (isValid) {
             resultField.setText("Syntax Analysis Successful!");
