@@ -1,5 +1,3 @@
-package com.miniCompiler;
-
 import java.util.List;
 
 public class ReadSemantic {
@@ -56,8 +54,10 @@ public class ReadSemantic {
 
     private boolean isDouble(String value) {
         try {
-            Double.parseDouble(value);
-            return true;
+            // Parse as double
+            double parsedValue = Double.parseDouble(value);
+            // Check if it contains a decimal point
+            return value.contains(".");
         } catch (NumberFormatException e) {
             return false;
         }
