@@ -61,7 +61,7 @@ It accepts `.java` and `.txt` files as input, analyzing their content for errors
 
 ## How to use
 - ### 1. **Launching the Application**
-- Open the Mini Compiler application from your device.
+- Open the **Mini Compiler** by running the `DisplayCompiler.java` file in your IDE (e.g., IntelliJ IDEA, VS Code). 
 - The application features a user-friendly interface with styled input fields (CurveTextField) and intuitive buttons (RoundedStud).
 
 ### 2. **Loading a File**
