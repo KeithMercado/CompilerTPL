@@ -55,19 +55,23 @@ It accepts `.java` and `.txt` files as input, analyzing their content for errors
   - Visual Studio Code (VS Code)  
 
 - **Language**:  
-  - Java  
+  - Java
 
-### How to use
+---
+
+## How to use
 - ### 1. **Launching the Application**
 - Open the Mini Compiler application from your device.
 - The application features a user-friendly interface with styled input fields (CurveTextField) and intuitive buttons (RoundedStud).
 
 ### 2. **Loading a File**
-- Click the **“Load File”** button.
-- Choose a `.java` or `.txt` file from your computer that you want to analyze.
+- Click the **“Open File”** button.
+- Choose a `.java` or `.txt` file from your computer that you want to analyze. 
 - Once loaded, the file content will appear in the display area.
 
 ### 3. **Running the Compilation Stages**
+
+**Note**: If an error is found in any stage, the process will stop, and you will not proceed to the next stage until the error is fixed.
 
 The compiler automatically processes the loaded file through the following stages:
 
@@ -90,18 +94,7 @@ The compiler automatically processes the loaded file through the following stage
 - **Errors detected**:
   - Using undeclared variables.
   - Mismatched data types (e.g., assigning an `int` value to a `double` variable).
-
-### 4. **Reviewing and Correcting Errors**
-- Errors detected at any stage are displayed in the **error log** with:
-  - Type of error (Lexical, Syntax, or Semantic).
-  - Error description.
-  - Line number.
-- Open the file in your code editor, make the necessary corrections, and reload the file into the Mini Compiler for verification.
-
-### 5. **Verifying Corrected Code**
-- After making corrections, reload the updated file.
-- Repeat the analysis until the compiler confirms the code is error-free.
-
+    
 ---
 
 ## Example Scenarios
@@ -113,7 +106,7 @@ The compiler automatically processes the loaded file through the following stage
 
 #### Syntax Error Example
 - **Input**: `int x = 100`
-- **Error**: "Missing semicolon at line 1."
+- **Error**: "Missing semicolon at end of code."
 - **Fix**: Add a semicolon: `int x = 100;`.
 
 #### Semantic Error Example
